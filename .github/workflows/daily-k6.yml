@@ -1,0 +1,37 @@
+name: Daily k6 smoke test
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    env:
+      K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+      K6_CLOUD_STACK_ID: ${{ vars.K6_CLOUD_STACK_ID }}
+      K6_CLOUD_PROJECT_ID: ${{ vars.K6_CLOUD_PROJECT_ID }}
+
+    steps:
+      - name: Check Europe time
+        id: europe_time
+        run: |
+          if [ "$(TZ=Europe/Prague date +%H)" = "10" ]; then
+            echo "run_smoke=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_smoke=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.europe_time.outputs.run_smoke == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v4
+
+      - name: Setup k6
+        if: steps.europe_time.outputs.run_smoke == 'true' || github.event_name == 'workflow_dispatch'
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run smoke test
+        if: steps.europe_time.outputs.run_smoke == 'true' || github.event_name == 'workflow_dispatch'
+        run: k6 cloud run --local-execution tests/01-smoke.js
