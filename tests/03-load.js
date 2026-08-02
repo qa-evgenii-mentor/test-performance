@@ -8,10 +8,10 @@ export const options ={
         load: {
             executor: 'ramping-vus',
             stages: [
-                {duration: "30s", target: 5},
-                {duration: "1m", target: 15},
-                {duration: "2m", target: 25},
-                {duration: "20s", target: 0},
+                {duration: "5s", target: 5},
+                {duration: "20s", target: 15},
+                {duration: "40s", target: 25},
+                {duration: "10s", target: 0},
             ]
         }
     },

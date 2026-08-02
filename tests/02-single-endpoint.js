@@ -3,7 +3,7 @@ import { check, sleep } from "k6"
 
 const BASE_URL = "https://httpbun.com"
 
-export const options ={ 
+export const options ={
     vus: 10,
     duration: "1m",
     threasholds: {
